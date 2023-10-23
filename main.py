@@ -12,7 +12,7 @@ dictionary=PyDictionary()
 # /start command
 @dp.message_handler(commands=['start'])
 async def cmd_start(message: types.Message):
-    await message.answer("qq eq")
+    await message.answer("*qq eq*", parse_mode="Markdown")
 
 # /chat command
 @dp.message_handler(commands=['chat'])
@@ -33,16 +33,17 @@ async def cmd_chat(message: types.Message):
     # Send the meanings back to the user
     response = ""
     for word, meaning in meanings.items():
-        response += f'{word}:\n'
+        response += f'Your word is: {word}\n'
         for pos, definitions in meaning.items():
-            response += f'Part of Speech: {pos}\n'
+            response += f'{pos}\n\n'
             for i, definition in enumerate(definitions, start=1):
                 # Remove parentheses from the definition
                 definition = definition.replace('(', '').replace(')', '')
                 response += f'{i}. {definition}\n'
-        response += '\n'
+            response += '\n'  # Separate meanings of different parts of speech
 
     await message.reply(response)
+
 
 # print(dictionary.meaning("password"))
 

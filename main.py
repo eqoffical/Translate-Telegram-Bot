@@ -33,7 +33,7 @@ async def cmd_chat(message: types.Message):
     # Send the meanings back to the user
     response = ""
     for word, meaning in meanings.items():
-        response += f'{word}:\n\n'
+        response += f'{word}:\n'
         for pos, definitions in meaning.items():
             response += f'Part of Speech: {pos}\n'
             for i, definition in enumerate(definitions, start=1):

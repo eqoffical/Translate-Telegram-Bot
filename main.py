@@ -20,17 +20,18 @@ async def cmd_start(message: types.Message):
     first_name = user.first_name
     await message.answer(f"Hello {first_name} 👋\n"
                         "\nI am a bot that will help you get the definition of any word!\n"
-                        "\nType /help if you need some insctrutions\n"
-                        "\n⚠️ Important: I can only understand one word at a time, so please don't attempt to ask me sentences")
+                        "\nType /help if you need some insctrutions\n")
 
 # /help command
 @dp.message_handler(commands=['help'])
 async def cmd_start(message: types.Message):
     user = message.from_user
     first_name = user.first_name
-    await message.reply(f"/chat \"word\" - put any word to get definitions (withou quotation marks)\n"
-                        "/help - shows this message\n"
-                        "/source - gives a link to GitHub repository and the developer of the bot")
+    await message.reply(f"/chat \"word\" - put any word to get definitions (without quotation marks)\n"
+                        "\n⚠️ Important: I can only understand one word at a time, so please don't attempt to ask me sentences\n"
+                        "\n/source - gives links to GitHub repository and the developer of the bot\n"
+                        "\n🐞 If you have any issues please report them\n"
+                        "\n/help - shows this message")
 
 # /source code
 @dp.message_handler(commands=['source'])
@@ -78,7 +79,7 @@ async def cmd_chat(message: types.Message):
 
         except:
 
-            await message.reply(f"❌ Your word is: {word}\n\nAnd I have no idea what is it, sorry")
+            await message.reply(f"❌ Your word is: {word}\nAnd I have no idea what is it, sorry")
 
     except:
 

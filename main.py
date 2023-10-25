@@ -5,11 +5,13 @@ import logging
 import asyncio
 from aiogram import Bot, Dispatcher, executor, types
 from PyDictionary import PyDictionary
+from deep_translator import GoogleTranslator
 
 logging.basicConfig(level=logging.INFO) # log
 bot = Bot(token=config.TOKEN) # init aiogram
 dp = Dispatcher(bot)
 dictionary=PyDictionary()
+translator = GoogleTranslator(source='en', target='uk')
 
 # /start command
 @dp.message_handler(commands=['start'])
@@ -34,7 +36,9 @@ async def cmd_chat(message: types.Message):
         response = ""
         for word, meaning in meanings.items():
 
-            response += f'🔮 Your word is: {word}\n'
+            translation = translator.translate(word)
+
+            response += f'🔮 Your word is: {word} - {translation}\n'
 
             for pos, definitions in meaning.items():
 

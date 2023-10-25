@@ -1,3 +1,5 @@
+# hint for developer 💡 print(dictionary.meaning("word"))
+
 import config
 import logging
 import asyncio
@@ -19,32 +21,37 @@ async def cmd_start(message: types.Message):
 async def cmd_chat(message: types.Message):
     user_word = message.text.replace('/chat', '', 1).strip()
 
-    # Split the user_word string into a list of words
     words = user_word.split()
-
     meanings = {}
 
-    for word in words:
-        # Remove parentheses
-        word = word.lstrip('(')
-        # Fetch meanings for the word
-        meanings[word] = dictionary.meaning(word)
+    try:
 
-    # Send the meanings back to the user
-    response = ""
-    for word, meaning in meanings.items():
-        response += f'{word}:\n'
-        for pos, definitions in meaning.items():
-            response += f'Part of Speech: {pos}\n'
-            for i, definition in enumerate(definitions, start=1):
-                # Remove parentheses from the definition
-                definition = definition.replace('(', '').replace(')', '')
-                response += f'{i}. {definition}\n'
-        response += '\n'
+        for word in words:
 
-    await message.reply(response)
+            word = word.lstrip('(')
+            meanings[word] = dictionary.meaning(word)
 
-# print(dictionary.meaning("password"))
+        response = ""
+        for word, meaning in meanings.items():
+
+            response += f'🔮 Your word is: {word}\n'
+
+            for pos, definitions in meaning.items():
+
+                response += f'\n{pos}\n'
+
+                for i, definition in enumerate(definitions, start=1):
+
+                    definition = definition.replace('(', '').replace(')', '')
+                    response += f'{i}. {definition}\n'
+
+            response += '\n'
+
+        await message.reply(response)
+
+    except:
+
+        await message.reply(f'❌ Your word is: {word}\n\nAnd I have no idea what is it, sorry')
 
 if __name__ == '__main__':
     from aiogram import executor

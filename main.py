@@ -16,46 +16,74 @@ translator = GoogleTranslator(source='en', target='uk')
 # /start command
 @dp.message_handler(commands=['start'])
 async def cmd_start(message: types.Message):
-    await message.answer("qq eq")
+    user = message.from_user
+    first_name = user.first_name
+    await message.answer(f"Hello {first_name} 👋\n"
+                        "\nI am a bot that will help you get the definition of any word!\n"
+                        "\nType /help if you need some insctrutions\n"
+                        "\n⚠️ Important: I can only understand one word at a time, so please don't attempt to ask me sentences")
+
+# /help command
+@dp.message_handler(commands=['help'])
+async def cmd_start(message: types.Message):
+    user = message.from_user
+    first_name = user.first_name
+    await message.reply(f"/chat \"word\" - put any word to get definitions (withou quotation marks)\n"
+                        "/help - shows this message\n"
+                        "/source - gives a link to GitHub repository and the developer of the bot")
+
+# /source code
+@dp.message_handler(commands=['source'])
+async def cmd_start(message: types.Message):
+    link = "https://github.com/eqoffical/Translate-Telegram-Bot"
+    await message.answer("Repository: <a href='{}'>GitHub</a>\n"
+                        "Developer: @eqoffical".format(link), parse_mode=types.ParseMode.HTML)
 
 # /chat command
 @dp.message_handler(commands=['chat'])
 async def cmd_chat(message: types.Message):
     user_word = message.text.replace('/chat', '', 1).strip()
 
-    words = user_word.split()
-    meanings = {}
-
     try:
 
-        for word in words:
+        words = user_word.split()
+        meanings = {}
 
-            word = word.lstrip('(')
-            meanings[word] = dictionary.meaning(word)
+        try:
 
-        response = ""
-        for word, meaning in meanings.items():
+            for word in words:
 
-            translation = translator.translate(word)
+                word = word.lstrip('(')
+                meanings[word] = dictionary.meaning(word)
 
-            response += f'🔮 Your word is: {word} - {translation}\n'
+            response = ""
+            for word, meaning in meanings.items():
 
-            for pos, definitions in meaning.items():
+                translation = translator.translate(word)
 
-                response += f'\n{pos}\n'
+                response += f"🔮 Your word is: {word} ({translation})\n"
 
-                for i, definition in enumerate(definitions, start=1):
+                for pos, definitions in meaning.items():
 
-                    definition = definition.replace('(', '').replace(')', '')
-                    response += f'{i}. {definition}\n'
+                    response += f'\n{pos}\n'
 
-            response += '\n'
+                    for i, definition in enumerate(definitions, start=1):
 
-        await message.reply(response)
+                        definition = definition.replace('(', '').replace(')', '')
+                        response += f'{i}. {definition}\n'
+
+                response += '\n'
+
+            await message.reply(response)
+
+        except:
+
+            await message.reply(f"❌ Your word is: {word}\n\nAnd I have no idea what is it, sorry")
 
     except:
 
-        await message.reply(f'❌ Your word is: {word}\n\nAnd I have no idea what is it, sorry')
+        await message.reply(f"❌ There is no word\n"
+                            "Type /help if you need some insctrutions")
 
 if __name__ == '__main__':
     from aiogram import executor

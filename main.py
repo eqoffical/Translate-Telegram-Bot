@@ -20,7 +20,8 @@ async def cmd_start(message: types.Message):
     first_name = user.first_name
     await message.answer(f"Hello {first_name} 👋\n"
                         "\nI am a bot that will help you get the definition of any word!\n"
-                        "\nType /help if you need some insctrutions\n")
+                        "\nType /help if you need some insctrutions\n"
+			"\n🐞 If you have any issues please report them")
 
 # /help command
 @dp.message_handler(commands=['help'])
@@ -28,7 +29,6 @@ async def cmd_start(message: types.Message):
     user = message.from_user
     first_name = user.first_name
     await message.reply(f"/chat \"word\" - put any word to get definitions (without quotation marks)\n"
-                        "\n⚠️ Important: I can only understand one word at a time, so please don't attempt to ask me sentences\n"
                         "\n/source - gives links to GitHub repository and the developer of the bot\n"
                         "\n🐞 If you have any issues please report them\n"
                         "\n/help - shows this message")

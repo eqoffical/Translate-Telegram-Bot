@@ -21,7 +21,7 @@ async def cmd_start(message: types.Message):
     await message.answer(f"Hello {first_name} 👋\n"
                         "\nI am a bot that will help you get the definition of any word!\n"
                         "\nType /help if you need some insctrutions\n"
-			"\n🐞 If you have any issues please report them")
+			            "\n🐞 If you have any issues please report them")
 
 # /help command
 @dp.message_handler(commands=['help'])

@@ -44,6 +44,9 @@ async def cmd_start(message: types.Message):
 # /chat command
 @dp.message_handler(commands=['chat'])
 async def cmd_chat(message: types.Message):
+
+    await message.answer("Thinking. . .")
+    
     user_word = message.text.replace('/chat', '', 1).strip()
 
     try:
@@ -90,6 +93,9 @@ async def cmd_chat(message: types.Message):
 # /translate command
 @dp.message_handler(commands=['translate'])
 async def cmd_chat(message: types.Message):
+
+    await message.answer("Думаю. . .")
+
     user_word = message.text.replace('/translate', '', 1).strip()
 
     try:

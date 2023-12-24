@@ -1,17 +1,20 @@
-# hint for developer 💡 print(dictionary.meaning("word"))
-
 import config
+import emoji
+import random
+import re
 import logging
 import asyncio
 from aiogram import Bot, Dispatcher, executor, types
 from PyDictionary import PyDictionary
 from deep_translator import GoogleTranslator
 
+cldr_names = list(emoji.EMOJI_DATA.keys()) 
 logging.basicConfig(level=logging.INFO) # log
 bot = Bot(token=config.TOKEN) # init aiogram
 dp = Dispatcher(bot)
 dictionary=PyDictionary()
 translator = GoogleTranslator(source='en', target='uk')
+pattern = r"\([^()]*\)"
 
 # /start command
 @dp.message_handler(commands=['start'])
@@ -50,30 +53,27 @@ async def cmd_chat(message: types.Message):
     user_word = message.text.replace('/chat', '', 1).strip()
 
     try:
-
         words = user_word.split()
         meanings = {}
 
         try:
-
             for word in words:
-
                 word = word.lstrip('(')
                 meanings[word] = dictionary.meaning(word)
 
             response = ""
+
+            name = random.choice(cldr_names)
+            
             for word, meaning in meanings.items():
 
                 translation = translator.translate(word)
-
-                response += f"🔮 Your word is: {word} ({translation})\n"
+                response += f"{emoji.emojize(name)} Your word is: {word} ({translation})\n"
 
                 for pos, definitions in meaning.items():
-
                     response += f'\n{pos}\n'
 
                     for i, definition in enumerate(definitions, start=1):
-
                         definition = definition.replace('(', '').replace(')', '')
                         response += f'{i}. {definition}\n'
 
@@ -81,12 +81,12 @@ async def cmd_chat(message: types.Message):
 
             await message.reply(response)
 
-        except:
-
-            await message.reply(f"❌ Your word is: {word}\nAnd I have no idea what is it, sorry")
+        except: 
+            translation = translator.translate(word)
+            translation = re.sub(pattern, "", translation)
+            await message.reply(f"❓ Your word is: {word}\nMaybe that's the translation: \"{translation}\"\nAnd I have no idea what is it, sorry")
 
     except:
-
         await message.reply(f"❌ There is no word\n"
                             "Type /help if you need some insctrutions")
 
@@ -99,31 +99,28 @@ async def cmd_chat(message: types.Message):
     user_word = message.text.replace('/translate', '', 1).strip()
 
     try:
-
         words = user_word.split()
         meanings = {}
 
         try:
-
             for word in words:
-
                 word = word.lstrip('(')
                 meanings[word] = dictionary.meaning(word)
 
             response = ""
+
+            name = random.choice(cldr_names)
+
             for word, meaning in meanings.items():
 
                 translation = translator.translate(word)
-
-                response += f"🔮 Ваше слово: {word} ({translation})\n"
+                response += f"{emoji.emojize(name)} Ваше слово: {word} ({translation})\n"
 
                 for pos, definitions in meaning.items():
-
                     translated_pos = translator.translate(pos)
                     response += f'\n{translated_pos}\n'
 
                     for i, definition in enumerate(definitions, start=1):
-
                         definition = definition.replace('(', '').replace(')', '')
                         translated_definition = translator.translate(definition)
                         response += f'{i}. {translated_definition}\n'
@@ -133,11 +130,11 @@ async def cmd_chat(message: types.Message):
             await message.reply(response)
 
         except:
-
-            await message.reply(f"❌ Ваше слово: {word}\nІ я навіть не знаю, що це таке, вибачте")
+            translation = translator.translate(word)
+            translation = re.sub(pattern, "", translation)
+            await message.reply(f"❓ Ваше слово: {word}\nМожливий переклад: \"{translation}\"\nЯ не знаю, що це таке, вибачте")
 
     except:
-
         await message.reply(f"❌ Тут немає слова\n"
                             "Спробуйте /help щоб отримати інструкції")
 

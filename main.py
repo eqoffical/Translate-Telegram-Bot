@@ -8,11 +8,11 @@ from aiogram import Bot, Dispatcher, executor, types
 from PyDictionary import PyDictionary
 from deep_translator import GoogleTranslator
 
-cldr_names = list(emoji.EMOJI_DATA.keys()) 
+cldr_emoji_name = list(emoji.EMOJI_DATA.keys()) 
 logging.basicConfig(level=logging.INFO) # log
 bot = Bot(token=config.TOKEN) # init aiogram
 dp = Dispatcher(bot)
-dictionary=PyDictionary()
+dictionary = PyDictionary()
 translator = GoogleTranslator(source='en', target='uk')
 pattern = r"\([^()]*\)"
 
@@ -44,13 +44,37 @@ async def cmd_start(message: types.Message):
     await message.answer("Repository: <a href='{}'>GitHub</a>\n"
                         "Developer: @eqoffical".format(link), parse_mode=types.ParseMode.HTML)
 
-# /chat command
-@dp.message_handler(commands=['chat'])
+# global language state
+pick_langauge = 0
+
+# /lang
+@dp.message_handler(commands=['lang'])
+async def cmd_start(message: types.Message):
+
+    global pick_langauge
+
+    # language toggle
+    pick_language_english = 0
+    pick_langauge_ukrainian = 1
+
+    if pick_langauge == pick_language_english:
+        pick_langauge = pick_langauge_ukrainian
+        await message.reply(f"{pick_langauge} 🇺🇦 Language was changed to ukrainian")
+
+    elif pick_langauge == pick_langauge_ukrainian:
+        pick_langauge = pick_language_english
+        await message.reply(f"{pick_langauge} 🇺🇸 Language was changed to english")
+
+    else:
+        await message.reply(f"{pick_langauge} I dunno bruh")
+
+# chatting
+@dp.message_handler()
 async def cmd_chat(message: types.Message):
 
     await message.answer("Thinking. . .")
     
-    user_word = message.text.replace('/chat', '', 1).strip()
+    user_word = message.text
 
     try:
         words = user_word.split()
@@ -58,17 +82,15 @@ async def cmd_chat(message: types.Message):
 
         try:
             for word in words:
-                word = word.lstrip('(')
                 meanings[word] = dictionary.meaning(word)
 
             response = ""
 
-            name = random.choice(cldr_names)
-            
             for word, meaning in meanings.items():
 
+                pick_emoji = random.choice(cldr_emoji_name)
                 translation = translator.translate(word)
-                response += f"{emoji.emojize(name)} Your word is: {word} ({translation})\n"
+                response = f"{emoji.emojize(pick_emoji)} Your word is: {word} ({translation})\n"
 
                 for pos, definitions in meaning.items():
                     response += f'\n{pos}\n'
@@ -89,54 +111,6 @@ async def cmd_chat(message: types.Message):
     except:
         await message.reply(f"❌ There is no word\n"
                             "Type /help if you need some insctrutions")
-
-# /translate command
-@dp.message_handler(commands=['translate'])
-async def cmd_chat(message: types.Message):
-
-    await message.answer("Думаю. . .")
-
-    user_word = message.text.replace('/translate', '', 1).strip()
-
-    try:
-        words = user_word.split()
-        meanings = {}
-
-        try:
-            for word in words:
-                word = word.lstrip('(')
-                meanings[word] = dictionary.meaning(word)
-
-            response = ""
-
-            name = random.choice(cldr_names)
-
-            for word, meaning in meanings.items():
-
-                translation = translator.translate(word)
-                response += f"{emoji.emojize(name)} Ваше слово: {word} ({translation})\n"
-
-                for pos, definitions in meaning.items():
-                    translated_pos = translator.translate(pos)
-                    response += f'\n{translated_pos}\n'
-
-                    for i, definition in enumerate(definitions, start=1):
-                        definition = definition.replace('(', '').replace(')', '')
-                        translated_definition = translator.translate(definition)
-                        response += f'{i}. {translated_definition}\n'
-
-                response += '\n'
-
-            await message.reply(response)
-
-        except:
-            translation = translator.translate(word)
-            translation = re.sub(pattern, "", translation)
-            await message.reply(f"❓ Ваше слово: {word}\nМожливий переклад: \"{translation}\"\nЯ не знаю, що це таке, вибачте")
-
-    except:
-        await message.reply(f"❌ Тут немає слова\n"
-                            "Спробуйте /help щоб отримати інструкції")
 
 if __name__ == '__main__':
     from aiogram import executor

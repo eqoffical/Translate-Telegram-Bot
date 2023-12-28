@@ -22,20 +22,20 @@ async def cmd_start(message: types.Message):
     user = message.from_user
     first_name = user.first_name
     await message.answer(f"Hello {first_name} 👋\n"
-                        "\nI am a bot that will help you get the definition of any word!\n"
-                        "\nType /help if you need some insctrutions\n"
-			            "\n🐞 If you have any issues please report them")
+                        "I am a bot that will help you get the definition of any word!\n\n"
+                        "Type /help if you need some insctrutions\n\n"
+                        "🐞 If you have any issues please report them")
 
 # /help command
 @dp.message_handler(commands=['help'])
 async def cmd_start(message: types.Message):
     user = message.from_user
     first_name = user.first_name
-    await message.reply(f"/chat \"word\" - put any word to get definitions (without quotation marks)\n"
-                        "\n/translate \"слово\" - введіть будь-яке слово, щоб отримати визначення (без лапок)\n"
-                        "\n/source - gives links to GitHub repository and the developer of the bot\n"
-                        "\n🐞 If you have any issues please report them\n"
-                        "\n/help - shows this message")
+    await message.reply("To get the definition of any word, just type it in the chat\n"
+                        "If there is more than one, it simply translates it\n\n"
+                        "/help - shows this message\n"
+                        "/source - gives links to GitHub and the developer of the bot\n\n"
+                        "🐞 If you have any issues please report them")
 
 # /source code
 @dp.message_handler(commands=['source'])
@@ -44,39 +44,21 @@ async def cmd_start(message: types.Message):
     await message.answer("Repository: <a href='{}'>GitHub</a>\n"
                         "Developer: @eqoffical".format(link), parse_mode=types.ParseMode.HTML)
 
-# global language state
-pick_langauge = 0
-
-# /lang
-@dp.message_handler(commands=['lang'])
-async def cmd_start(message: types.Message):
-
-    global pick_langauge
-
-    # language toggle
-    pick_language_english = 0
-    pick_langauge_ukrainian = 1
-
-    if pick_langauge == pick_language_english:
-        pick_langauge = pick_langauge_ukrainian
-        await message.reply(f"{pick_langauge} 🇺🇦 Language was changed to ukrainian")
-
-    elif pick_langauge == pick_langauge_ukrainian:
-        pick_langauge = pick_language_english
-        await message.reply(f"{pick_langauge} 🇺🇸 Language was changed to english")
-
-    else:
-        await message.reply(f"{pick_langauge} I dunno bruh")
-
 # chatting
 @dp.message_handler()
 async def cmd_chat(message: types.Message):
+        
+    total_words = 0
+    text = message.text.replace('/words', '')
+    for word in text.split():
+        total_words += 1
 
     await message.answer("Thinking. . .")
-    
     user_word = message.text
 
-    try:
+    # Dictionary answer
+    if total_words == 1:
+
         words = user_word.split()
         meanings = {}
 
@@ -104,12 +86,22 @@ async def cmd_chat(message: types.Message):
             await message.reply(response)
 
         except: 
+            pick_emoji = random.choice(cldr_emoji_name)
             translation = translator.translate(word)
-            translation = re.sub(pattern, "", translation)
-            await message.reply(f"❓ Your word is: {word}\nMaybe that's the translation: \"{translation}\"\nAnd I have no idea what is it, sorry")
+            await message.reply(f"{emoji.emojize(pick_emoji)} Your word is: {word} ({translation})\n\n"
+                                "Sorry, but this word is not in the dictionary")
+   
+    # Translation 
+    elif total_words > 1:
+        
+        pick_emoji = random.choice(cldr_emoji_name)
+        translation = translator.translate(user_word)
+        response = f"{emoji.emojize(pick_emoji)} Your words: {user_word}\n\nTranslation: {translation}"
 
-    except:
-        await message.reply(f"❌ There is no word\n"
+        await message.reply(response)
+
+    else:
+        await message.reply(f"❌ There is no word/words\n"
                             "Type /help if you need some insctrutions")
 
 if __name__ == '__main__':

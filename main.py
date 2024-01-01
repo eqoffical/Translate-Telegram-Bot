@@ -80,49 +80,34 @@ async def cmd_chat(message: types.Message):
             this_is_ukrainian_text = 0
             this_is_english_text = 0
 
+    # Debug
     await message.reply(f"En: {this_is_english_text}, Uk: {this_is_ukrainian_text}")
 
     # Dictionary answer
     if total_words == 1:
 
-        words = user_word.split()
-        meanings = {}
+        if this_is_english_text == 1 and this_is_ukrainian_text == 0:
+            word = user_word
 
-        if this_is_ukrainian_text == 0 and this_is_english_text == 1:
-            pass
-        
-        elif this_is_ukrainian_text == 1 and this_is_english_text == 0:
-            words = reverse_translator.translate(words)
-
-        try:
-            
-            for word in words:
-                meanings[word] = dictionary.meaning(word)
-
-            response = ""
-
-            for word, meaning in meanings.items():
+        elif this_is_english_text == 0 and this_is_ukrainian_text == 1:
+            word = reverse_translator.translate(user_word)
                 
-                translation = translator.translate(words)    
-                pick_emoji = random.choice(cldr_emoji_name)
-                response = f"{emoji.emojize(pick_emoji)} Your word is: {word} ({translation})\n"
+        # translation = translator.translate(user_word)    
+        # pick_emoji = random.choice(cldr_emoji_name)
+        # response = f"{emoji.emojize(pick_emoji)} Your word is: {user_word} ({translation})\n\n"
 
-                for pos, definitions in meaning.items():
-                    response += f'\n{pos}\n'
+        translation = translator.translate(user_word)
 
-                    for i, definition in enumerate(definitions, start=1):
-                        definition = definition.replace('(', '').replace(')', '')
-                        response += f'{i}. {definition}\n'
+        response = f"{word}, {user_word}\n"
+        response += dictionary.meaning(word)
 
-                response += '\n'
+        await message.reply(response)
 
-            await message.reply(response)
-
-        except: 
-            pick_emoji = random.choice(cldr_emoji_name)
-            translation = translator.translate(word)
-            await message.reply(f"{emoji.emojize(pick_emoji)} Your word is: {word} ({translation})\n\n"
-                                "Sorry, but this word is not in the dictionary")
+        # except: 
+        #     pick_emoji = random.choice(cldr_emoji_name)
+        #     translation = translator.translate(word)
+        #     await message.reply(f"{emoji.emojize(pick_emoji)} Your word is: {word} ({translation})\n\n"
+        #                         "Sorry, but this word is not in the dictionary")
    
     # Translation 
     elif total_words > 1:

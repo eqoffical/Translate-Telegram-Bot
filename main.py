@@ -15,7 +15,7 @@ bot = Bot(token=config.TOKEN) # init aiogram
 dp = Dispatcher(bot)
 dictionary = PyDictionary()
 translator = GoogleTranslator(source='en', target='uk')
-perekladach = GoogleTranslator(source='uk', target='en')
+reverse_translator = GoogleTranslator(source='uk', target='en')
 pattern = r"\([^()]*\)"
 
 # /start command
@@ -80,14 +80,22 @@ async def cmd_chat(message: types.Message):
             this_is_ukrainian_text = 0
             this_is_english_text = 0
 
+    await message.reply(f"En: {this_is_english_text}, Uk: {this_is_ukrainian_text}")
+
     # Dictionary answer
     if total_words == 1:
 
         words = user_word.split()
         meanings = {}
 
+        if this_is_ukrainian_text == 0 and this_is_english_text == 1:
+            pass
         
+        elif this_is_ukrainian_text == 1 and this_is_english_text == 0:
+            words = reverse_translator.translate(words)
+
         try:
+            
             for word in words:
                 meanings[word] = dictionary.meaning(word)
 
@@ -95,13 +103,7 @@ async def cmd_chat(message: types.Message):
 
             for word, meaning in meanings.items():
                 
-                # i'll do it tomorrow  
-                # if this_is_ukrainian_text == 1 and this_is_english_text == 0:
-                #     translation = perekladach.translate(word)
-
-                # elif this_is_ukrainian_textk == 0 and this_is_english_text == 1:
-                #     translation = translator.translate(word)
-
+                translation = translator.translate(words)    
                 pick_emoji = random.choice(cldr_emoji_name)
                 response = f"{emoji.emojize(pick_emoji)} Your word is: {word} ({translation})\n"
 

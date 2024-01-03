@@ -47,11 +47,19 @@ async def cmd_start(message: types.Message):
 # chatting
 @dp.message_handler()
 async def cmd_chat(message: types.Message):
-        
+    
+    text = message.text 
+    
     total_words = 0
-    text = message.text.replace('/words', '')
+    total_characters = 0
+    word_limit = 256
+    characters_limit = 45
+    
     for word in text.split():
         total_words += 1
+
+    for character in text:  
+        total_characters += 1
 
     await message.answer("Thinking. . .")
     user_word = message.text
@@ -60,36 +68,37 @@ async def cmd_chat(message: types.Message):
     UKRAINIAN_LETTERS = "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя'-"
     ENGLISH_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"
 
-    for character in user_word:
-        
-        if character in UKRAINIAN_LETTERS + " ":
-            this_is_ukrainian_text = 1
-            this_is_english_text = 0
+    ukrainian_count = 0
+    english_count = 0
+    
+    for character in text:
+        if character in UKRAINIAN_LETTERS:
+            ukrainian_count += 1
+        if character in ENGLISH_LETTERS:  
+            english_count += 1
 
-        elif character in ENGLISH_LETTERS + " ":
-            this_is_ukrainian_text = 0
-            this_is_english_text = 1
+    if ukrainian_count > 0:
+        this_is_ukrainian_text = True
+    else:
+        this_is_ukrainian_text = False
 
-        elif character in UKRAINIAN_LETTERS + ENGLISH_LETTERS + " ":
-            this_is_ukrainian_text = 1
-            this_is_ukrainian_text = 1
-
-        else:
-            this_is_ukrainian_text = 0
-            this_is_english_text = 0
+    if english_count > 0:
+        this_is_english_text = True  
+    else:
+        this_is_english_text = False
 
     # # Debug
     # await message.reply(f"En: {this_is_english_text}, Uk: {this_is_ukrainian_text}")
 
     # Dictionary answer
-    if total_words == 1:
+    if total_words == 1 and total_characters <= characters_limit:
 
         try:
 
-            if this_is_english_text == 1 and this_is_ukrainian_text == 0:
+            if this_is_english_text == True and this_is_ukrainian_text == False:
                 word = user_word
 
-            elif this_is_english_text == 0 and this_is_ukrainian_text == 1:
+            elif this_is_english_text == False and this_is_ukrainian_text == True:
                 
                 # word = reverse_translator.translate(user_word) <-- 
                 
@@ -101,7 +110,7 @@ async def cmd_chat(message: types.Message):
             meanings = dictionary.meaning(word)
             pick_emoji = random.choice(cldr_emoji_name)
 
-            response = f"{emoji.emojize(pick_emoji)} Your word is: {word}\n💬 Translation: {translation}\n"
+            response = f"{emoji.emojize(pick_emoji)} The word: {word}\n\n💬 Translation: {translation}\n"
             # response = f"{word} - {translation}\n\n{dictionary.meaning(word)}"
         
             for part_of_speech, definitions in meanings.items():
@@ -117,18 +126,40 @@ async def cmd_chat(message: types.Message):
             pick_emoji = random.choice(cldr_emoji_name)
             translation = translator.translate(word)
             
-            response = f"{emoji.emojize(pick_emoji)} Your word is: {word} \n💬 Possible translation: {translation}\n\n"
-            apologies = f"Sorry, but this word is not in the dictionary\nYou can try type \"{user_word}\" in a different way"
+            response = f"{emoji.emojize(pick_emoji)} {total_characters} The word: {word}\n\n💬 Translation: {translation}\n\n"
+            apologies = f"💡 Sorry, but this word is not in the dictionary\nYou can try type \"{user_word}\" in a different way"
             
             await message.reply(response + apologies)
-   
-    # Translation 
-    elif total_words > 1:
+    
+    elif total_characters > characters_limit:
         
+        response = f"💡 Sorry, but you have reached the characters limit, the maximum number of characters in single word is {characters_limit}"
+        await message.reply(response)
+
+    # Translation 
+    elif total_words > 1 and total_words < word_limit:
+
+        if this_is_english_text == True and this_is_ukrainian_text == False:
+            word = user_word
+            post_text = ""
+
+        elif this_is_english_text == False and this_is_ukrainian_text == True:
+            word = reverse_translator.translate(user_word)
+            post_text = ""
+
+        elif this_is_english_text == True and this_is_ukrainian_text == True:
+            word = reverse_translator.translate(user_word)
+            post_text = "⚠ Please, don't send english and ukrainian at the same time"
+            
         pick_emoji = random.choice(cldr_emoji_name)
         translation = translator.translate(user_word)
-        response = f"{emoji.emojize(pick_emoji)} Your words: {user_word}\n\n💬 Translation: {translation}"
+        response = f"{emoji.emojize(pick_emoji)} The text: {word}\n\n💬 Translation: {translation}\n\n{post_text}"
 
+        await message.reply(response)
+
+    elif total_words > word_limit:
+
+        response = f"💡 Sorry, but you have reached the word limit, the maximum number of words is {word_limit}"
         await message.reply(response)
 
     else:

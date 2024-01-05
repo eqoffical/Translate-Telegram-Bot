@@ -11,6 +11,8 @@ from deep_translator import GoogleTranslator
 cldr_emoji_name = list(emoji.EMOJI_DATA.keys()) 
 logging.basicConfig(level=logging.INFO) # log
 bot = Bot(token=config.TOKEN) # init aiogram
+github_link = config.GITHUB_LINK
+tg_link = config.TELEGRAM_LINK
 dp = Dispatcher(bot)
 dictionary = PyDictionary()
 translator = GoogleTranslator(source='en', target='uk')
@@ -21,28 +23,37 @@ reverse_translator = GoogleTranslator(source='uk', target='en')
 async def cmd_start(message: types.Message):
     user = message.from_user
     first_name = user.first_name
-    await message.answer(f"Hello {first_name} 👋\n\n"
-                        "I am a bot that will help you get the definition of any word!\n\n"
-                        "Type /help if you need some insctrutions\n\n"
-                        "🐞 If you have any issues please report them")
+
+    text = f"Hello {first_name} 👋\n\n"
+    text += "I am the bot that will help you get the definition of any word!\nBy the way, join the "
+    text += "<a href='{}'>group </a>".format(tg_link)
+    text += "of this bot, you can propose an idea or report an issue!\n\n"
+    text += "Type /help if you need some insctrutions\n\n"
+    text += "🐞 If you have any issues please report them"
+
+    await message.answer(text, parse_mode=types.ParseMode.HTML, disable_web_page_preview=True)                        
 
 # /help command
 @dp.message_handler(commands=['help'])
 async def cmd_start(message: types.Message):
     user = message.from_user
     first_name = user.first_name
-    await message.reply("To get the definition of any word, just type it in the chat\n"
-                        "If there is more than one, it simply translates it\n\n"
+    await message.reply("To get the definition of any word, just enter it in the chat.\n"
+                        "If there is more than one, it will simply translate it\n\n"
                         "/help - shows this message\n"
-                        "/source - gives links to GitHub and the developer of the bot\n\n"
+                        "/report - gives links to group of this bot and to GitHub repository\n\n"
                         "🐞 If you have any issues please report them")
 
-# /source code
-@dp.message_handler(commands=['source'])
+# /report command
+@dp.message_handler(commands=['report'])
 async def cmd_start(message: types.Message):
-    link = "https://github.com/eqoffical/Translate-Telegram-Bot"
-    await message.answer("Repository: <a href='{}'>GitHub</a>\n"
-                        "Developer: @eqoffical".format(link), parse_mode=types.ParseMode.HTML)
+
+    text = "So, to report, you can write to the group, or create an issue on GitHub:\n\n"
+    text += "<a href='{}'>💌 The group</a>\n".format(tg_link)
+    text += "<a href='{}'>🐞 The GitHub repository</a>\n\n".format(github_link)
+    text += "Thank you so much for your feedback!"
+
+    await message.answer(text, parse_mode=types.ParseMode.HTML, disable_web_page_preview=True)
 
 # chatting
 @dp.message_handler()

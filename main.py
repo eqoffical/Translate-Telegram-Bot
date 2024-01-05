@@ -21,7 +21,7 @@ reverse_translator = GoogleTranslator(source='uk', target='en')
 async def cmd_start(message: types.Message):
     user = message.from_user
     first_name = user.first_name
-    await message.answer(f"Hello {first_name} 👋\n"
+    await message.answer(f"Hello {first_name} 👋\n\n"
                         "I am a bot that will help you get the definition of any word!\n\n"
                         "Type /help if you need some insctrutions\n\n"
                         "🐞 If you have any issues please report them")
@@ -126,7 +126,7 @@ async def cmd_chat(message: types.Message):
             pick_emoji = random.choice(cldr_emoji_name)
             translation = translator.translate(word)
             
-            response = f"{emoji.emojize(pick_emoji)} {total_characters} The word: {word}\n\n💬 Translation: {translation}\n\n"
+            response = f"{emoji.emojize(pick_emoji)} The word: {word}\n\n💬 Translation: {translation}\n\n"
             apologies = f"💡 Sorry, but this word is not in the dictionary\nYou can try type \"{user_word}\" in a different way"
             
             await message.reply(response + apologies)

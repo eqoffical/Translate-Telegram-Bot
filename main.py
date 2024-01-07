@@ -39,10 +39,11 @@ async def cmd_start(message: types.Message):
     user = message.from_user
     first_name = user.first_name
     await message.reply("To get the definition of any word, just enter it in the chat.\n"
-                        "If there is more than one, it will simply translate it\n\n"
-                        "/help - shows this message\n"
-                        "/report - gives links to group of this bot and to GitHub repository\n\n"
-                        "🐞 If you have any issues please report them")
+                        "If there is more than one, it will simply translate it.\n\n"
+                        "Also, if you didn't get the definition of a word or didn't get its translation, you can try writing it without dashes or other characters that may cause a problem, and if you still don't get the answer you want, please report it to let dev know 🙏\n\n"
+                        "/report - gives links to group of this bot and to GitHub repository\n"
+                        "/help - shows this message\n\n"
+                        "🐞 If you have any other issues, please report them as well")
 
 # /report command
 @dp.message_handler(commands=['report'])
@@ -62,15 +63,10 @@ async def cmd_chat(message: types.Message):
     text = message.text 
     
     total_words = 0
-    total_characters = 0
     word_limit = 256
-    characters_limit = 45
     
     for word in text.split():
         total_words += 1
-
-    for character in text:  
-        total_characters += 1
 
     await message.answer("Thinking. . .")
     user_word = message.text
@@ -102,7 +98,7 @@ async def cmd_chat(message: types.Message):
     # await message.reply(f"En: {this_is_english_text}, Uk: {this_is_ukrainian_text}")
 
     # Dictionary answer
-    if total_words == 1 and total_characters <= characters_limit:
+    if total_words == 1:
 
         try:
 
@@ -141,11 +137,6 @@ async def cmd_chat(message: types.Message):
             apologies = f"💡 Sorry, but this word is not in the dictionary\nYou can try type \"{user_word}\" in a different way"
             
             await message.reply(response + apologies)
-    
-    elif total_characters > characters_limit:
-        
-        response = f"💡 Sorry, but you have reached the characters limit, the maximum number of characters in single word is {characters_limit}"
-        await message.reply(response)
 
     # Translation 
     elif total_words > 1 and total_words < word_limit:

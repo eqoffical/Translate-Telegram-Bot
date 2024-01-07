@@ -24,12 +24,12 @@ async def cmd_start(message: types.Message):
     user = message.from_user
     first_name = user.first_name
 
-    text = f"Hello {first_name} 👋\n\n"
-    text += "I am the bot that will help you get the definition of any word!\nBy the way, join the "
-    text += "<a href='{}'>group </a>".format(tg_link)
-    text += "of this bot, you can propose an idea or report an issue!\n\n"
-    text += "Type /help if you need some insctrutions\n\n"
-    text += "🐞 If you have any issues please report them"
+    text = f"Привіт {first_name} 👋\n\n"
+    text += "Я бот, який допоможе тобі знайти визначення будь-якого слова!\nДо речі, приєднуйся до "
+    text += "<a href='{}'>групи </a>".format(tg_link)
+    text += "цього бота, ти можеш запропонувати ідею або повідомити про проблему!\n\n"
+    text += "Напиши /help якщо тобі необхідна допомога\n\n"
+    text += "🐞 Якщо у тебе є якісь проблеми, будь ласка, повідом про них"
 
     await message.answer(text, parse_mode=types.ParseMode.HTML, disable_web_page_preview=True)                        
 
@@ -38,21 +38,21 @@ async def cmd_start(message: types.Message):
 async def cmd_start(message: types.Message):
     user = message.from_user
     first_name = user.first_name
-    await message.reply("To get the definition of any word, just enter it in the chat.\n"
-                        "If there is more than one, it will simply translate it.\n\n"
-                        "Also, if you didn't get the definition of a word or didn't get its translation, you can try writing it without dashes or other characters that may cause a problem, and if you still don't get the answer you want, please report it to let dev know 🙏\n\n"
-                        "/report - gives links to group of this bot and to GitHub repository\n"
-                        "/help - shows this message\n\n"
-                        "🐞 If you have any other issues, please report them as well")
+    await message.reply("Щоб отримати визначення будь-якого слова, просто введіть його у чат.\n"
+                        "Якщо їх декілька, то речення буде просто перекладено.\n\n"
+                        "Також, якщо ви не отримали визначення слова або не отримали його переклад, ви можете спробувати написати його без дефізу або інших символів, які можуть спричинити проблему, і якщо ви все одно не отримаєте потрібну відповідь, будь ласка, повідомте про це розробнику 🙏\n\n"
+                        "/report - дає посилання на групу цього бота та на репозиторій GitHub\n"
+                        "/help - показує це повідомлення\n\n"
+                        "🐞 Якщо у вас виникли будь-які інші проблеми, будь ласка, повідомте про них також")
 
 # /report command
 @dp.message_handler(commands=['report'])
 async def cmd_start(message: types.Message):
 
-    text = "So, to report, you can write to the group, or create an issue on GitHub:\n\n"
-    text += "<a href='{}'>💌 The group</a>\n".format(tg_link)
-    text += "<a href='{}'>🐞 The GitHub repository</a>\n\n".format(github_link)
-    text += "Thank you so much for your feedback!"
+    text = "Отже, щоб повідомити, ви можете написати в групу або створити проблему на GitHub:\n\n"
+    text += "<a href='{}'>💌 Група</a>\n".format(tg_link)
+    text += "<a href='{}'>🐞 Репозиторій GitHub</a>\n\n".format(github_link)
+    text += "Щиро дякуємо за ваш відгук!"
 
     await message.answer(text, parse_mode=types.ParseMode.HTML, disable_web_page_preview=True)
 
@@ -117,7 +117,7 @@ async def cmd_chat(message: types.Message):
             meanings = dictionary.meaning(word)
             pick_emoji = random.choice(cldr_emoji_name)
 
-            response = f"{emoji.emojize(pick_emoji)} The word: {word}\n\n💬 Translation: {translation}\n"
+            response = f"{emoji.emojize(pick_emoji)} Слово: {word}\n\n💬 Переклад: {translation}\n"
             # response = f"{word} - {translation}\n\n{dictionary.meaning(word)}"
         
             for part_of_speech, definitions in meanings.items():
@@ -133,8 +133,8 @@ async def cmd_chat(message: types.Message):
             pick_emoji = random.choice(cldr_emoji_name)
             translation = translator.translate(word)
             
-            response = f"{emoji.emojize(pick_emoji)} The word: {word}\n\n💬 Translation: {translation}\n\n"
-            apologies = f"💡 Sorry, but this word is not in the dictionary\nYou can try type \"{user_word}\" in a different way"
+            response = f"{emoji.emojize(pick_emoji)} Слово: {word}\n\n💬 Переклад: {translation}\n\n"
+            apologies = f"💡 Вибачте, але цього слова немає у словнику\nВи можете спробувати ввести \"{user_word}\" іншим способом"
             
             await message.reply(response + apologies)
 
@@ -151,22 +151,22 @@ async def cmd_chat(message: types.Message):
 
         elif this_is_english_text == True and this_is_ukrainian_text == True:
             word = reverse_translator.translate(user_word)
-            post_text = "⚠ Please, don't send english and ukrainian at the same time"
+            post_text = "⚠ Будь ласка, не надсилайте англійську та українську мови одночасно"
             
         pick_emoji = random.choice(cldr_emoji_name)
         translation = translator.translate(user_word)
-        response = f"{emoji.emojize(pick_emoji)} The text: {word}\n\n💬 Translation: {translation}\n\n{post_text}"
+        response = f"{emoji.emojize(pick_emoji)} Текст: {word}\n\n💬 Переклад: {translation}\n\n{post_text}"
 
         await message.reply(response)
 
     elif total_words > word_limit:
 
-        response = f"💡 Sorry, but you have reached the word limit, the maximum number of words is {word_limit}"
+        response = f"💡 Вибачте, але ви досягли ліміту слів, максимальна кількість слів становить {word_limit}"
         await message.reply(response)
 
     else:
-        await message.reply(f"❌ There is no word/words\n"
-                            "Type /help if you need some insctrutions")
+        await message.reply(f"❌ Тут немає слова/слів\n"
+                            "Напиши /help якщо тобі необхідна допомога")
 
 if __name__ == '__main__':
     from aiogram import executor

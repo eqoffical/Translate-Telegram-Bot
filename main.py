@@ -107,8 +107,6 @@ async def cmd_chat(message: types.Message):
 
             elif this_is_english_text == False and this_is_ukrainian_text == True:
                 
-                # word = reverse_translator.translate(user_word) <-- 
-                
                 translated = reverse_translator.translate(user_word)
                 translated_words = translated.split(' ')
                 word = max(translated_words, key=len)
@@ -118,13 +116,13 @@ async def cmd_chat(message: types.Message):
             pick_emoji = random.choice(cldr_emoji_name)
 
             response = f"{emoji.emojize(pick_emoji)} Слово: {word}\n\n💬 Переклад: {translation}\n"
-            # response = f"{word} - {translation}\n\n{dictionary.meaning(word)}"
-        
+
             for part_of_speech, definitions in meanings.items():
                 response += f"\n{part_of_speech}:\n"
                 for definition in definitions:
                     clean_def = definition.translate(str.maketrans('', '', '[]()'''))
-                    response += f"• {clean_def}\n"
+                    translated_def = translator.translate(clean_def) 
+                    response += f"• {translated_def}\n"
 
             await message.reply(response)
 
